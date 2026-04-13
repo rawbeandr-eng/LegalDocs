@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalDocs Nepal - Document Automation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #1e40af;
+            --secondary: #dc2626;
+            --accent: #f59e0b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #059669;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: var(--card);
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 420px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .error-message {
+            color: var(--secondary);
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* Main App Layout */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .logo-text h2 {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-profile {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            padding: 1rem;
+            background: var(--bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-info h4 {
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .user-info p {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .logout-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            color: var(--text);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            padding: 0.625rem 1.25rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg);
+        }
+
+        .btn-primary {
+            padding: 0.625rem 1.25rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Dashboard Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            color: var(--success);
+            margin-top: 0.25rem;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Templates Grid */
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .template-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .template-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .template-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .template-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .template-card p {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .template-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* Document Editor */
+        .editor-container {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .editor-toolbar {
+            background: var(--bg);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-btn {
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .editor-form {
+            padding: 2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .preview-panel {
+            background: #f8fafc;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .document-preview {
+            background: white;
+            padding: 3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 800px;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.8;
+        }
+
+        .document-preview h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .document-field {
+            background: #fef3c7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            color: var(--accent);
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        /* Client Management */
+        .client-list {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .client-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr 100px;
+            padding: 1rem 1.5rem;
+            background: var(--bg);
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .client-item {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr 100px;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .client-item:hover {
+            background: var(--bg);
+        }
+
+        .client-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .client-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        .client-type.individual {
+            background: var(--success);
+        }
+
+        /* Recent Documents */
+        .recent-docs {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .doc-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .doc-item:last-child {
+            border-bottom: none;
+        }
+
+        .doc-item:hover {
+            background: var(--bg);
+            border-radius: 8px;
+        }
+
+        .doc-icon {
+            width: 40px;
+            height: 40px;
+            background: #fee2e2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            margin-right: 1rem;
+        }
+
+        .doc-info h4 {
+            font-size: 0.95rem;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .doc-info p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .doc-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.2s;
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Nepali Date Converter */
+        .date-converter {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .date-converter h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .converter-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .converter-result {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .client-header, .client-item {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .client-header {
+                display: none;
+            }
+
+            .client-item > div {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .client-item > div::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--text-light);
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            animation: slideIn 0.3s ease;
+            z-index: 2000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar, .header, .editor-toolbar, .btn {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+            }
+
+            .document-preview {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+    <base target="_blank">
+</head>
+<body>
+<!-- Login Screen -->
+<div class="login-container" id="loginScreen">
+    <div class="login-box">
+        <div class="login-header">
+            <h1>⚖️ LegalDocs Nepal</h1>
+            <p>Document Automation System for Legal Professionals</p>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn">
+                Sign In
+                <span class="spinner" id="loginSpinner"></span>
+            </button>
+            <div class="error-message" id="errorMessage">
+                Invalid credentials. Please try again.
+            </div>
+        </form>
+        <div style="margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-light);">
+            <p>Default: username: <strong>abcd</strong> | password: <strong>1234</strong></p>
+        </div>
+    </div>
+</div>
+
+<!-- Main Application -->
+<div class="app-container" id="appContainer">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+            <div class="logo-icon">⚖️</div>
+            <div class="logo-text">
+                <h2>LegalDocs Nepal</h2>
+                <p>Advocate Document System</p>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a class="nav-link active" onclick="showSection('dashboard')">
+                    <span>📊</span> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="showSection('templates')">
+                    <span>📄</span> Document Templates
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="showSection('editor')">
+                    <span>✏️</span> Document Editor
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="showSection('clients')">
+                    <span>👥</span> Client Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="showSection('calendar')">
+                    <span>📅</span> Court Calendar
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="showSection('settings')">
+                    <span>⚙️</span> Settings
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-profile">
+            <div class="user-avatar">A</div>
+            <div class="user-info">
+                <h4>Advocate User</h4>
+                <p>Kathmandu District Court</p>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <div class="content-section active" id="dashboard">
+            <div class="header">
+                <h1>Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="syncData()">🔄 Sync</button>
+                    <button class="btn-primary" onclick="showSection('editor')">+ New Document</button>
+                </div>
+            </div>
+
+            <!-- Nepali Date Converter -->
+            <div class="date-converter">
+                <h3>📅 Nepali Date Converter (Bikram Sambat)</h3>
+                <div class="converter-row">
+                    <div class="form-group" style="flex: 1; min-width: 200px;">
+                        <label>Gregorian Date</label>
+                        <input type="date" id="gregorianDate" onchange="convertToNepali()">
+                    </div>
+                    <div style="font-size: 1.5rem;">➜</div>
+                    <div class="converter-result" id="nepaliDateResult">
+                        २०८१ चैत्र ३० गते
+                    </div>
+                    <button class="btn-primary" onclick="useToday()" style="width: auto;">Use Today</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Documents</h3>
+                    <div class="stat-value">156</div>
+                    <div class="stat-change">↑ 12 this month</div>
+                </div>
+                <div class="stat-card" style="border-left-color: var(--success);">
+                    <h3>Active Clients</h3>
+                    <div class="stat-value" style="color: var(--success);">48</div>
+                    <div class="stat-change">↑ 3 new this week</div>
+                </div>
+                <div class="stat-card" style="border-left-color: var(--accent);">
+                    <h3>Pending Cases</h3>
+                    <div class="stat-value" style="color: var(--accent);">23</div>
+                    <div class="stat-change">5 hearings tomorrow</div>
+                </div>
+                <div class="stat-card" style="border-left-color: var(--secondary);">
+                    <h3>Draft Documents</h3>
+                    <div class="stat-value" style="color: var(--secondary);">8</div>
+                    <div class="stat-change">Requires review</div>
+                </div>
+            </div>
+
+            <div class="recent-docs">
+                <h3 style="margin-bottom: 1rem;">Recent Documents</h3>
+                <div id="recentDocsList">
+                    <div class="doc-item">
+                        <div class="doc-icon">📄</div>
+                        <div class="doc-info">
+                            <h4>Power of Attorney - Ram Bahadur Thapa</h4>
+                            <p>Created today at 2:30 PM • Property Transaction</p>
+                        </div>
+                        <div class="doc-actions">
+                            <button class="action-btn" onclick="editDocument(1)">✏️</button>
+                            <button class="action-btn" onclick="downloadDocument(1)">💾</button>
+                            <button class="action-btn" onclick="printDocument(1)">🖨️</button>
+                        </div>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-icon">📄</div>
+                        <div class="doc-info">
+                            <h4>Affidavit - Sita Devi Sharma</h4>
+                            <p>Created yesterday • Income Declaration</p>
+                        </div>
+                        <div class="doc-actions">
+                            <button class="action-btn" onclick="editDocument(2)">✏️</button>
+                            <button class="action-btn" onclick="downloadDocument(2)">💾</button>
+                            <button class="action-btn" onclick="printDocument(2)">🖨️</button>
+                        </div>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-icon">📄</div>
+                        <div class="doc-info">
+                            <h4>Company Registration - Himalayan Tech Pvt. Ltd.</h4>
+                            <p>Created 2 days ago • OCR Application</p>
+                        </div>
+                        <div class="doc-actions">
+                            <button class="action-btn" onclick="editDocument(3)">✏️</button>
+                            <button class="action-btn" onclick="downloadDocument(3)">💾</button>
+                            <button class="action-btn" onclick="printDocument(3)">🖨️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Templates Section -->
+        <div class="content-section" id="templates">
+            <div class="header">
+                <h1>Document Templates</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary">Filter</button>
+                    <button class="btn-primary" onclick="showModal('addTemplate')">+ Add Template</button>
+                </div>
+            </div>
+
+            <div class="templates-grid" id="templatesGrid">
+                <!-- Templates will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Document Editor Section -->
+        <div class="content-section" id="editor">
+            <div class="header">
+                <h1>Document Editor</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="saveDraft()">Save Draft</button>
+                    <button class="btn-primary" onclick="generateDocument()">Generate Document</button>
+                </div>
+            </div>
+
+            <div class="editor-container">
+                <div class="editor-toolbar">
+                    <button class="toolbar-btn" onclick="insertField('client_name')">{'{'}Client Name{'}'}</button>
+                    <button class="toolbar-btn" onclick="insertField('address')">{'{'}Address{'}'}</button>
+                    <button class="toolbar-btn" onclick="insertField('date')">{'{'}Date{'}'}</button>
+                    <button class="toolbar-btn" onclick="insertField('nepali_date')">{'{'}Nepali Date{'}'}</button>
+                    <button class="toolbar-btn" onclick="insertField('case_no')">{'{'}Case No{'}'}</button>
+                    <button class="toolbar-btn" onclick="insertField('court')">{'{'}Court Name{'}'}</button>
+                    <button class="toolbar-btn" onclick="insertField('amount')">{'{'}Amount{'}'}</button>
+                </div>
+
+                <div class="editor-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Select Template</label>
+                            <select id="templateSelect" onchange="loadTemplate()">
+                                <option value="">-- Select a template --</option>
+                                <option value="power_of_attorney">Power of Attorney (मुख्तियारनामा)</option>
+                                <option value="affidavit">Affidavit (सपथ पत्र)</option>
+                                <option value="agreement">Agreement (सम्झौता पत्र)</option>
+                                <option value="notice">Legal Notice (कानूनी सूचना)</option>
+                                <option value="application">Court Application (अदालत निवेदन)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Client</label>
+                            <select id="clientSelect">
+                                <option value="">-- Select client --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row" id="dynamicFields">
+                        <!-- Dynamic fields based on template -->
+                    </div>
+
+                    <div class="form-group">
+                        <label>Document Content</label>
+                        <textarea id="documentContent" placeholder="Select a template or start typing..."></textarea>
+                    </div>
+                </div>
+
+                <div class="preview-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>Preview</h3>
+                        <div>
+                            <button class="btn-secondary" onclick="refreshPreview()">Refresh Preview</button>
+                            <button class="btn-primary" onclick="printDocument()">Print / PDF</button>
+                        </div>
+                    </div>
+                    <div class="document-preview" id="documentPreview">
+                        <h2>Document Preview</h2>
+                        <p style="text-align: center; color: var(--text-light);">
+                            Select a template and fill in the details to see the preview here.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clients Section -->
+        <div class="content-section" id="clients">
+            <div class="header">
+                <h1>Client Management</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary">Import</button>
+                    <button class="btn-primary" onclick="showModal('addClient')">+ Add Client</button>
+                </div>
+            </div>
+
+            <div class="client-list">
+                <div class="client-header">
+                    <div>Name</div>
+                    <div>Contact</div>
+                    <div>Type</div>
+                    <div>Cases</div>
+                    <div>Actions</div>
+                </div>
+                <div id="clientListBody">
+                    <!-- Clients populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="content-section" id="calendar">
+            <div class="header">
+                <h1>Court Calendar</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary">Export</button>
+                    <button class="btn-primary">+ Add Hearing</button>
+                </div>
+            </div>
+
+            <div style="background: var(--card); padding: 3rem; border-radius: 12px; text-align: center; box-shadow: var(--shadow);">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📅</div>
+                <h3 style="margin-bottom: 0.5rem;">Calendar View</h3>
+                <p style="color: var(--text-light);">Court hearing dates and case schedules will appear here.</p>
+                <p style="margin-top: 1rem; color: var(--accent); font-size: 0.9rem;">
+                    Bikram Sambat calendar integration coming soon
+                </p>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="content-section" id="settings">
+            <div class="header">
+                <h1>Settings</h1>
+            </div>
+
+            <div style="display: grid; gap: 1.5rem; max-width: 800px;">
+                <div class="stat-card">
+                    <h3>Profile Settings</h3>
+                    <div class="form-row" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Advocate Name</label>
+                            <input type="text" value="Ram Prasad Sharma" id="advocateName">
+                        </div>
+                        <div class="form-group">
+                            <label>Bar Council No</label>
+                            <input type="text" value="12345" id="barCouncilNo">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Court Jurisdiction</label>
+                            <input type="text" value="Kathmandu District Court" id="courtJurisdiction">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="text" value="+977 9841XXXXXX" id="contactNumber">
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width: auto; margin-top: 1rem;" onclick="saveSettings()">Save Changes</button>
+                </div>
+
+                <div class="stat-card" style="border-left-color: var(--success);">
+                    <h3>Data Management</h3>
+                    <p style="margin: 1rem 0; color: var(--text-light); font-size: 0.9rem;">
+                        Manage your offline data storage and backup settings.
+                    </p>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn-secondary">Export All Data</button>
+                        <button class="btn-secondary">Clear Cache</button>
+                    </div>
+                </div>
+
+                <div class="stat-card" style="border-left-color: var(--accent);">
+                    <h3>System Information</h3>
+                    <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-light);">
+                        <p>Version: 1.0.0 (Nepal Edition)</p>
+                        <p>Last Sync: <span id="lastSync">Never</span></p>
+                        <p>Storage Used: 45 MB / 500 MB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Add Client Modal -->
+<div class="modal" id="addClientModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Client</h2>
+            <button class="close-btn" onclick="closeModal('addClient')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Full Name (English)</label>
+                <input type="text" id="newClientName" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label>Full Name (Nepali)</label>
+                <input type="text" id="newClientNameNepali" placeholder="नेपाली नाम" style="font-family: 'Noto Sans Devanagari', sans-serif;">
+            </div>
+            <div class="form-group">
+                <label>Citizenship Number</label>
+                <input type="text" id="newClientCitizenship" placeholder="00-00-00-00000">
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="newClientAddress" placeholder="District, Municipality, Ward">
+            </div>
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input type="tel" id="newClientPhone" placeholder="+977 XXXXXXXXXX">
+            </div>
+            <div class="form-group">
+                <label>Client Type</label>
+                <select id="newClientType">
+                    <option value="individual">Individual</option>
+                    <option value="company">Company</option>
+                    <option value="ngo">NGO/INGO</option>
+                    <option value="government">Government</option>
+                </select>
+            </div>
+            <button class="btn-primary" style="width: 100%; margin-top: 1rem;" onclick="addClient()">Add Client</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast">Operation successful!</div>
+
+<script>
+        // Data Storage
+        const storage = {
+            clients: [
+                { id: 1, name: 'Ram Bahadur Thapa', nameNepali: 'राम बहादुर थापा', type: 'individual', phone: '9841123456', address: 'Kathmandu-10, Ward 5', cases: 2 },
+                { id: 2, name: 'Sita Devi Sharma', nameNepali: 'सीता देवी शर्मा', type: 'individual', phone: '9841987654', address: 'Lalitpur-5, Ward 3', cases: 1 },
+                { id: 3, name: 'Himalayan Tech Pvt. Ltd.', nameNepali: 'हिमालयन टेक प्रा. लि.', type: 'company', phone: '01-4444444', address: 'Kathmandu-1, Trade Tower', cases: 3 },
+                { id: 4, name: 'Green Valley NGO', nameNepali: 'ग्रिन भ्याली एनजिओ', type: 'ngo', phone: '01-5555555', address: 'Bhaktapur-8, Ward 2', cases: 1 }
+            ],
+            templates: [
+                { id: 'power_of_attorney', name: 'Power of Attorney', nameNepali: 'मुख्तियारनामा', icon: '📜', category: 'Property', description: 'General power of attorney for property and legal matters' },
+                { id: 'affidavit', name: 'Affidavit', nameNepali: 'सपथ पत्र', icon: '📋', category: 'Declaration', description: 'Sworn statement for various legal declarations' },
+                { id: 'agreement', name: 'Agreement', nameNepali: 'सम्झौता पत्र', icon: '🤝', category: 'Contract', description: 'General agreement template for transactions' },
+                { id: 'notice', name: 'Legal Notice', nameNepali: 'कानूनी सूचना', icon: '📢', category: 'Notice', description: 'Formal legal notice for disputes and demands' },
+                { id: 'application', name: 'Court Application', nameNepali: 'अदालत निवेदन', icon: '⚖️', category: 'Court', description: 'General application format for court proceedings' },
+                { id: 'will', name: 'Will/Testament', nameNepali: 'वसियतनामा', icon: '📜', category: 'Property', description: 'Last will and testament document' },
+                { id: 'loan', name: 'Loan Agreement', nameNepali: 'ऋण सम्झौता', icon: '💰', category: 'Financial', description: 'Loan agreement with security details' },
+                { id: 'employment', name: 'Employment Contract', nameNepali: 'कर्मचारी सम्झौता', icon: '👔', category: 'Labor', description: 'Standard employment contract template' }
+            ],
+            documents: [],
+            currentUser: null
+        };
+
+        // Template Content Database
+        const templateContent = {
+            power_of_attorney: `GOVERNMENT OF NEPAL
+POWER OF ATTORNEY
+(मुख्तियारनामा)
+
+Date: {date}
+Nepali Date: {nepali_date}
+
+I, {client_name}, son/daughter of {father_name}, permanent resident of {address}, holding Citizenship No. {citizenship_no} issued by {issued_district} District Administration Office, do hereby appoint {attorney_name}, advocate of {court_name}, as my true and lawful attorney.
+
+My attorney shall have full power and authority to:
+1. Represent me in all legal matters before {court_name} and other relevant authorities
+2. File, prosecute, and defend cases on my behalf
+3. Execute all necessary documents and deeds
+4. Receive payments and give valid receipts
+5. Do all other acts necessary and incidental to the above
+
+This power of attorney is granted for the purpose of {purpose} and shall remain valid until revoked in writing.
+
+Witnesses:
+1. {witness1_name}, Address: {witness1_address}
+2. {witness2_name}, Address: {witness2_address}
+
+_________________
+{client_name}
+Principal
+
+_________________
+{attorney_name}
+Attorney`,
+
+            affidavit: `GOVERNMENT OF NEPAL
+AFFIDAVIT
+(सपथ पत्र)
+
+Date: {date}
+Nepali Date: {nepali_date}
+
+I, {client_name}, aged {age}, son/daughter of {father_name}, occupation {occupation}, permanent resident of {address}, holding Citizenship No. {citizenship_no}, do solemnly affirm and declare as follows:
+
+1. That I am the deponent above named and a citizen of Nepal by birth/descent/naturalization.
+
+2. That {statement_content}
+
+3. That the facts stated above are true to the best of my knowledge and belief.
+
+4. That I understand that making a false statement in this affidavit is punishable under the Nepal Penal Code, 2074.
+
+Verified at {location} on this {date} day of {month}, {year}.
+
+_________________
+{client_name}
+Deponent
+
+Sworn before me:
+_________________
+Notary Public/Advocate
+{notary_name}`,
+
+            agreement: `GOVERNMENT OF NEPAL
+AGREEMENT
+(सम्झौता पत्र)
+
+This Agreement is made on {date} (Nepali Date: {nepali_date}) between:
+
+FIRST PARTY:
+{party1_name}, son/daughter of {party1_father}, permanent resident of {party1_address}, hereinafter called the "First Party"
+
+AND
+
+SECOND PARTY:
+{party2_name}, son/daughter of {party2_father}, permanent resident of {party2_address}, hereinafter called the "Second Party"
+
+WITNESSETH:
+
+WHEREAS the First Party is the owner of {property_description} situated at {property_location};
+
+AND WHEREAS the First Party has agreed to {agreement_purpose} with the Second Party on the following terms and conditions:
+
+1. CONSIDERATION: The total consideration amount is NPR {amount} (Rupees {amount_words} only).
+
+2. PAYMENT TERMS: {payment_terms}
+
+3. DURATION: This agreement shall be valid for {duration} from the date of execution.
+
+4. TERMINATION: {termination_clause}
+
+5. GOVERNING LAW: This agreement shall be governed by the laws of Nepal.
+
+IN WITNESS WHEREOF, both parties have signed this agreement on the date first mentioned above.
+
+_________________                    _________________
+First Party                           Second Party
+
+WITNESSES:
+1. {witness1_name}                    2. {witness2_name}
+   {witness1_address}                    {witness2_address}`
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for saved session
+            const savedSession = localStorage.getItem('legalDocsSession');
+            if (savedSession) {
+                const session = JSON.parse(savedSession);
+                if (session.isLoggedIn) {
+                    showApp();
+                }
+            }
+
+            // Populate templates
+            populateTemplates();
+
+            // Populate clients
+            populateClients();
+            populateClientSelect();
+
+            // Set today's date
+            useToday();
+        });
+
+        // Login Function
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const spinner = document.getElementById('loginSpinner');
+            const errorMsg = document.getElementById('errorMessage');
+
+            spinner.style.display = 'inline-block';
+
+            setTimeout(() => {
+                if (username === 'abcd' && password === '1234') {
+                    localStorage.setItem('legalDocsSession', JSON.stringify({
+                        isLoggedIn: true,
+                        username: username,
+                        loginTime: new Date().toISOString()
+                    }));
+                    showApp();
+                    showToast('Welcome to LegalDocs Nepal!');
+                } else {
+                    errorMsg.style.display = 'block';
+                    spinner.style.display = 'none';
+                }
+            }, 800);
+        });
+
+        function showApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+        }
+
+        function logout() {
+            localStorage.removeItem('legalDocsSession');
+            location.reload();
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update nav active state
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Template Functions
+        function populateTemplates() {
+            const grid = document.getElementById('templatesGrid');
+            grid.innerHTML = storage.templates.map(template => `
+                <div class="template-card" onclick="selectTemplate('${template.id}')">
+                    <div class="template-icon">${template.icon}</div>
+                    <h3>${template.name}</h3>
+                    <p style="font-family: 'Noto Sans Devanagari', sans-serif; color: var(--primary); font-size: 0.9rem; margin-bottom: 0.5rem;">${template.nameNepali}</p>
+                    <p>${template.description}</p>
+                    <div class="template-meta">
+                        <span>📁 ${template.category}</span>
+                        <span>⚡ Auto-fill</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectTemplate(templateId) {
+            document.getElementById('templateSelect').value = templateId;
+            showSection('editor');
+            loadTemplate();
+        }
+
+        function loadTemplate() {
+            const templateId = document.getElementById('templateSelect').value;
+            const content = templateContent[templateId] || '';
+            document.getElementById('documentContent').value = content;
+            generateDynamicFields(templateId);
+            refreshPreview();
+        }
+
+        function generateDynamicFields(templateId) {
+            const container = document.getElementById('dynamicFields');
+            const fields = {
+                power_of_attorney: [
+                    { name: 'father_name', label: "Father's Name", type: 'text' },
+                    { name: 'citizenship_no', label: 'Citizenship Number', type: 'text' },
+                    { name: 'issued_district', label: 'Issued District', type: 'text' },
+                    { name: 'attorney_name', label: 'Attorney Name', type: 'text' },
+                    { name: 'court_name', label: 'Court Name', type: 'text' },
+                    { name: 'purpose', label: 'Purpose', type: 'textarea' },
+                    { name: 'witness1_name', label: 'Witness 1 Name', type: 'text' },
+                    { name: 'witness1_address', label: 'Witness 1 Address', type: 'text' },
+                    { name: 'witness2_name', label: 'Witness 2 Name', type: 'text' },
+                    { name: 'witness2_address', label: 'Witness 2 Address', type: 'text' }
+                ],
+                affidavit: [
+                    { name: 'age', label: 'Age', type: 'number' },
+                    { name: 'father_name', label: "Father's Name", type: 'text' },
+                    { name: 'occupation', label: 'Occupation', type: 'text' },
+                    { name: 'citizenship_no', label: 'Citizenship Number', type: 'text' },
+                    { name: 'statement_content', label: 'Statement Content', type: 'textarea' },
+                    { name: 'location', label: 'Location', type: 'text' },
+                    { name: 'notary_name', label: 'Notary/Advocate Name', type: 'text' }
+                ],
+                agreement: [
+                    { name: 'party1_father', label: 'Party 1 Father Name', type: 'text' },
+                    { name: 'party1_address', label: 'Party 1 Address', type: 'text' },
+                    { name: 'party2_name', label: 'Party 2 Name', type: 'text' },
+                    { name: 'party2_father', label: 'Party 2 Father Name', type: 'text' },
+                    { name: 'party2_address', label: 'Party 2 Address', type: 'text' },
+                    { name: 'property_description', label: 'Property Description', type: 'textarea' },
+                    { name: 'property_location', label: 'Property Location', type: 'text' },
+                    { name: 'agreement_purpose', label: 'Agreement Purpose', type: 'textarea' },
+                    { name: 'amount', label: 'Amount (NPR)', type: 'number' },
+                    { name: 'amount_words', label: 'Amount in Words', type: 'text' },
+                    { name: 'payment_terms', label: 'Payment Terms', type: 'textarea' },
+                    { name: 'duration', label: 'Duration', type: 'text' },
+                    { name: 'termination_clause', label: 'Termination Clause', type: 'textarea' },
+                    { name: 'witness1_name', label: 'Witness 1 Name', type: 'text' },
+                    { name: 'witness1_address', label: 'Witness 1 Address', type: 'text' },
+                    { name: 'witness2_name', label: 'Witness 2 Name', type: 'text' },
+                    { name: 'witness2_address', label: 'Witness 2 Address', type: 'text' }
+                ]
+            };
+
+            const templateFields = fields[templateId] || [];
+            container.innerHTML = templateFields.map(field => `
+                <div class="form-group">
+                    <label>${field.label}</label>
+                    ${field.type === 'textarea'
+                        ? `<textarea id="field_${field.name}" placeholder="Enter ${field.label.toLowerCase()}..." oninput="refreshPreview()"></textarea>`
+                        : `<input type="${field.type}" id="field_${field.name}" placeholder="Enter ${field.label.toLowerCase()}..." oninput="refreshPreview()">`
+                    }
+                </div>
+            `).join('');
+        }
+
+        function insertField(field) {
+            const textarea = document.getElementById('documentContent');
+            const cursorPos = textarea.selectionStart;
+            const textBefore = textarea.value.substring(0, cursorPos);
+            const textAfter = textarea.value.substring(cursorPos);
+            const fieldText = `{${field}}`;
+            textarea.value = textBefore + fieldText + textAfter;
+            refreshPreview();
+        }
+
+        function refreshPreview() {
+            let content = document.getElementById('documentContent').value;
+            const clientId = document.getElementById('clientSelect').value;
+            const client = storage.clients.find(c => c.id == clientId);
+
+            // Replace fields
+            const replacements = {
+                '{date}': new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                '{nepali_date}': document.getElementById('nepaliDateResult').textContent,
+                '{client_name}': client ? client.name : '[CLIENT NAME]',
+                '{address}': client ? client.address : '[ADDRESS]',
+                '{case_no}': 'Case No. ' + Math.floor(Math.random() * 10000) + '/' + new Date().getFullYear(),
+                '{court}': document.getElementById('courtJurisdiction')?.value || '[COURT NAME]',
+                '{month}': new Date().toLocaleDateString('en-US', { month: 'long' }),
+                '{year}': new Date().getFullYear()
+            };
+
+            // Add dynamic field values
+            document.querySelectorAll('[id^="field_"]').forEach(field => {
+                const fieldName = field.id.replace('field_', '');
+                replacements[`{${fieldName}}`] = field.value || `[${fieldName.toUpperCase().replace(/_/g, ' ')}]`;
+            });
+
+            Object.keys(replacements).forEach(key => {
+                content = content.replace(new RegExp(key.replace(/[{}]/g, '\\$&'), 'g'),
+                    `<span class="document-field">${replacements[key]}</span>`);
+            });
+
+            document.getElementById('documentPreview').innerHTML = content.replace(/\n/g, '<br>');
+        }
+
+        function generateDocument() {
+            refreshPreview();
+            showToast('Document generated successfully!');
+            window.print();
+        }
+
+        function saveDraft() {
+            const doc = {
+                id: Date.now(),
+                content: document.getElementById('documentContent').value,
+                template: document.getElementById('templateSelect').value,
+                client: document.getElementById('clientSelect').value,
+                createdAt: new Date().toISOString()
+            };
+            storage.documents.push(doc);
+            localStorage.setItem('legalDocsDrafts', JSON.stringify(storage.documents));
+            showToast('Draft saved successfully!');
+        }
+
+        // Client Functions
+        function populateClients() {
+            const list = document.getElementById('clientListBody');
+            list.innerHTML = storage.clients.map(client => `
+                <div class="client-item">
+                    <div data-label="Name:">
+                        <div class="client-name">${client.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-light); font-family: 'Noto Sans Devanagari', sans-serif;">${client.nameNepali}</div>
+                    </div>
+                    <div data-label="Contact:">${client.phone}<br><small>${client.address}</small></div>
+                    <div data-label="Type:"><span class="client-type ${client.type}">${client.type}</span></div>
+                    <div data-label="Cases:">${client.cases} active</div>
+                    <div data-label="Actions:">
+                        <button class="action-btn" onclick="editClient(${client.id})">✏️</button>
+                        <button class="action-btn" onclick="viewClient(${client.id})">👁️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateClientSelect() {
+            const select = document.getElementById('clientSelect');
+            select.innerHTML = '<option value="">-- Select client --</option>' +
+                storage.clients.map(c => `<option value="${c.id}">${c.name} (${c.type})</option>`).join('');
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId + 'Modal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId + 'Modal').classList.remove('active');
+        }
+
+        function addClient() {
+            const newClient = {
+                id: storage.clients.length + 1,
+                name: document.getElementById('newClientName').value,
+                nameNepali: document.getElementById('newClientNameNepali').value,
+                citizenship: document.getElementById('newClientCitizenship').value,
+                address: document.getElementById('newClientAddress').value,
+                phone: document.getElementById('newClientPhone').value,
+                type: document.getElementById('newClientType').value,
+                cases: 0
+            };
+
+            storage.clients.push(newClient);
+            populateClients();
+            populateClientSelect();
+            closeModal('addClient');
+            showToast('Client added successfully!');
+
+            // Clear form
+            document.querySelectorAll('#addClientModal input').forEach(input => input.value = '');
+        }
+
+        // Nepali Date Converter (Simplified)
+        function convertToNepali() {
+            const gregorian = document.getElementById('gregorianDate').value;
+            if (!gregorian) return;
+
+            // Simplified conversion - in production, use proper library
+            const date = new Date(gregorian);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+
+            // Rough approximation (actual conversion requires complex algorithm)
+            const nepaliYear = year + 57;
+            const nepaliMonth = month < 4 ? month + 9 : month - 3;
+            const nepaliDay = day;
+
+            const nepaliMonths = ['बैशाख', 'जेठ', 'असार', 'साउन', 'भदौ', 'असोज', 'कार्तिक', 'मंसिर', 'पुष', 'माघ', 'फाल्गुन', 'चैत्र'];
+            const monthName = nepaliMonths[nepaliMonth - 1] || 'चैत्र';
+
+            document.getElementById('nepaliDateResult').textContent =
+                `${nepaliYear} ${monthName} ${nepaliDay} गते`;
+        }
+
+        function useToday() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('gregorianDate').value = today;
+            convertToNepali();
+        }
+
+        // Utility Functions
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function syncData() {
+            showToast('Syncing data...');
+            setTimeout(() => {
+                document.getElementById('lastSync').textContent = new Date().toLocaleString();
+                showToast('Data synced successfully!');
+            }, 1500);
+        }
+
+        function saveSettings() {
+            showToast('Settings saved successfully!');
+        }
+
+        function editDocument(id) {
+            showToast('Opening document editor...');
+        }
+
+        function downloadDocument(id) {
+            showToast('Downloading document...');
+        }
+
+        function printDocument(id) {
+            window.print();
+        }
+
+        function editClient(id) {
+            showToast('Opening client editor...');
+        }
+
+        function viewClient(id) {
+            showToast('Viewing client details...');
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
